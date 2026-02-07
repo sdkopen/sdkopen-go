@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type WebContext interface {
+type ServerContext interface {
 	Context() context.Context
 	Response() http.ResponseWriter
 	Request() *http.Request
@@ -25,9 +25,9 @@ type WebContext interface {
 	FormFile(key string) (multipart.File, *multipart.FileHeader, error)
 	AddHeader(key string, value string)
 	AddHeaders(headers map[string]string)
-	Redirect(url string, httpStatusCode HttpStatusCode)
+	Redirect(url string, statusCode HttpStatusCode)
 	ServeFile(path string)
-	JsonResponse(httpStatusCode HttpStatusCode, body any)
-	ErrorResponse(httpStatusCode HttpStatusCode, err error)
-	EmptyResponse(httpStatusCode HttpStatusCode)
+	JsonResponse(statusCode HttpStatusCode, body any)
+	ErrorResponse(statusCode HttpStatusCode, err error)
+	EmptyResponse(statusCode HttpStatusCode)
 }

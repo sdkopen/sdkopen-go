@@ -24,7 +24,7 @@ func Initialize() {
 }
 
 func createLogHandler() slog.Handler {
-	logLevel := os.Getenv("LOG_LEVEL")
+	logLevel := os.Getenv("SDKOPEN_LOG_LEVEL")
 	if !slices.Contains([]string{"debug", "info", "warn", "error"}, logLevel) {
 		logLevel = "info"
 	}

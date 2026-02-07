@@ -5,10 +5,11 @@ import (
 	_ "encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 
-	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/sdkopen/sdkopen-go/logging"
 	"github.com/sdkopen/sdkopen-go/observer"
 )
@@ -38,7 +39,7 @@ func (s *ChiWebServer) InjectMiddlewares() {
 }
 
 func (s *ChiWebServer) InjectCustomMiddlewares() {
-	for _, srvMiddleware := range server.SrvMiddlewares {
+	for _, srvMiddleware := range ServerMiddlewares {
 		s.registerCustomMiddleware(srvMiddleware)
 	}
 }
@@ -59,8 +60,12 @@ func (s *ChiWebServer) InjectRoutes() {
 }
 
 func (s *ChiWebServer) ListenAndServe() error {
+	serverPort := os.Getenv("SDKOPEN_SERVER_PORT")
+	if serverPort != "" {
+		serverPort = "8080"
+	}
 	s.srv = &http.Server{
-		Addr:    fmt.Sprintf(":%d", 8080),
+		Addr:    fmt.Sprintf(":%d", serverPort),
 		Handler: s.engine,
 	}
 	return s.srv.ListenAndServe()

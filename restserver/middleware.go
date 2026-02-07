@@ -3,7 +3,7 @@ package restserver
 import "net/http"
 
 type IMiddleware interface {
-	Apply(ctx WebContext) error
+	Apply(ctx ServerContext) error
 }
 
 func accessControlMiddleware(next http.Handler) http.Handler {
