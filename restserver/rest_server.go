@@ -4,11 +4,13 @@ import (
 	"log"
 
 	"github.com/sdkopen/sdkopen-go/logging"
+	"github.com/sdkopen/sdkopen-go/observer"
 )
 
 var (
 	ServerRoutes      []Route
 	ServerMiddlewares []IMiddleware
+	ServerInstance    Server
 )
 
 type Server interface {
@@ -29,17 +31,13 @@ func RegisterMiddleware(middleware IMiddleware) {
 }
 
 func ListenAndServe(server func() Server) {
-	srv := server()
-	srv.Initialize()
-	srv.InjectMiddlewares()
-	srv.InjectCustomMiddlewares()
-	srv.InjectRoutes()
+	ServerInstance = server()
+	ServerInstance.Initialize()
+	ServerInstance.InjectMiddlewares()
+	ServerInstance.InjectCustomMiddlewares()
+	ServerInstance.InjectRoutes()
 
+	observer.Attach(restObserver{})
 	logging.Info("Service '%s' running in %d port", "REST-SERVER", 8080)
-	log.Fatal(srv.ListenAndServe())
-}
-
-func GET(route Route) {
-	route.Path = "GET-" + route.Path
-	ServerRoutes = append(ServerRoutes, route)
+	log.Fatal(ServerInstance.ListenAndServe())
 }

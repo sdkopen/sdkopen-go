@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/sdkopen/sdkopen-go/logging"
+	"github.com/sdkopen/sdkopen-go/observer"
 )
 
 type ChiWebServer struct {
@@ -18,7 +19,7 @@ type ChiWebServer struct {
 	wg     *sync.WaitGroup
 }
 
-func CreateChiServer() restserver.Server {
+func CreateChiServer() Server {
 	return &ChiWebServer{}
 }
 
@@ -44,19 +45,16 @@ func (s *ChiWebServer) InjectCustomMiddlewares() {
 
 func (s *ChiWebServer) InjectRoutes() {
 
-	for _, route := range server.SrvRoutes {
-		routeUri := string(route.Prefix) + route.URI
-		fn := route.Function
-
-		s.engine.MethodFunc(route.Method.String(), routeUri, func(w http.ResponseWriter, r *http.Request) {
+	for _, route := range ServerRoutes {
+		s.engine.MethodFunc(route.HttpMethod.String(), route.Path, func(w http.ResponseWriter, r *http.Request) {
 			s.wg.Add(1)
 			defer s.wg.Done()
 			webContext := &chiWebContext{writer: w, request: r}
 
-			fn(webContext)
+			route.Function(webContext)
 		})
 
-		logging.Info("Registered route [%7s] %s", route.Method, routeUri)
+		logging.Info("Registered route [%7s] %s", route.HttpMethod, route.Path)
 	}
 }
 
@@ -68,7 +66,7 @@ func (s *ChiWebServer) ListenAndServe() error {
 	return s.srv.ListenAndServe()
 }
 
-func (s *ChiWebServer) registerCustomMiddleware(m server.CustomMiddleware) {
+func (s *ChiWebServer) registerCustomMiddleware(m IMiddleware) {
 	s.engine.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			webCtx := &chiWebContext{writer: w, request: r}

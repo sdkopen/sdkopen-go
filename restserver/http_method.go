@@ -3,15 +3,15 @@ package restserver
 type HttpMethod int
 
 const (
-	MethodGet HttpMethod = iota
-	MethodHead
-	MethodPost
-	MethodPut
-	MethodPatch
-	MethodDelete
-	MethodConnect
-	MethodOptions
-	MethodTrace
+	Get HttpMethod = iota
+	Head
+	Post
+	Put
+	Patch
+	Delete
+	Connect
+	Options
+	Trace
 )
 
 func (httpMethod HttpMethod) String() string {

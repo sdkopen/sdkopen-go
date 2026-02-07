@@ -1,0 +1,6 @@
+github.com/go-chi/chi v1.5.5 h1:vOB/HbEMt9QqBqErz07QehcOKHaWFtuj87tTDVz2qXE=
+github.com/go-chi/chi v1.5.5/go.mod h1:C9JqLr3tIYjDOZpzn+BCuxY8z8vmca43EeMgyZt7irw=
+github.com/go-chi/chi/v5 v5.2.5 h1:Eg4myHZBjyvJmAFjFvWgrqDTXFyOzjj7YIm3L3mu6Ug=
+github.com/go-chi/chi/v5 v5.2.5/go.mod h1:X7Gx4mteadT3eDOMTsXzmI4/rwUpOwBHLpAfupzFJP0=
+github.com/sdkopen/sdkopen-go-webbase v1.0.8 h1:axeHapFfN3k5bg6dKI3jYmSkhVsqNo/whEp6DVouMOo=
+github.com/sdkopen/sdkopen-go-webbase v1.0.8/go.mod h1:s9OnpyVKaQNrsu+Dnu/rvGusHDZmRIwcWVTbZo8N6t4=
