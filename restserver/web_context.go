@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type ServerContext interface {
+type WebContext interface {
 	Context() context.Context
 	Response() http.ResponseWriter
 	Request() *http.Request
