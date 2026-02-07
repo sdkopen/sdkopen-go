@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/go-chi/chi/v5"
@@ -60,10 +61,16 @@ func (s *ChiWebServer) InjectRoutes() {
 }
 
 func (s *ChiWebServer) ListenAndServe() error {
-	serverPort := os.Getenv("SDKOPEN_SERVER_PORT")
-	if serverPort != "" {
-		serverPort = "8080"
+	serverPortStr := os.Getenv("SDKOPEN_SERVER_PORT")
+	if serverPortStr == "" {
+		serverPortStr = "8080"
 	}
+
+	serverPort, err := strconv.Atoi(serverPortStr)
+	if err != nil {
+		serverPort = 8080
+	}
+
 	s.srv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", serverPort),
 		Handler: s.engine,
