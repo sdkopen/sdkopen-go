@@ -13,14 +13,19 @@ const (
 )
 
 var (
-	SQL_DB_DRIVER   string = "postgres"
-	SQL_DB_PORT            = 5432
-	SQL_DB_NAME            = ""
-	SQL_DB_SSL_MODE        = ""
-	SQL_DB_URL             = ""
-	SQL_DB_USERNAME        = ""
-	SQL_DB_PASSWORD        = ""
-	SERVER_PORT            = 8080
+	SQL_DB_DRIVER     string = "postgres"
+	SQL_DB_PORT              = 5432
+	SQL_DB_NAME              = ""
+	SQL_DB_SSL_MODE          = ""
+	SQL_DB_URL               = ""
+	SQL_DB_USERNAME          = ""
+	SQL_DB_PASSWORD          = ""
+	SERVER_PORT              = 8080
+	RABBITMQ_URL             = ""
+	RABBITMQ_PORT            = 5672
+	RABBITMQ_USERNAME        = ""
+	RABBITMQ_PASSWORD        = ""
+	RABBITMQ_VHOST           = ""
 )
 
 // Load loads and validates all environment variables. It's used in app initialization.
@@ -38,6 +43,11 @@ func Load() error {
 	SQL_DB_PASSWORD = os.Getenv("SQL_DB_PASSWORD")
 	SQL_DB_DRIVER = os.Getenv("SQL_DB_DRIVER")
 
+	RABBITMQ_URL = os.Getenv("RABBITMQ_URL")
+	RABBITMQ_USERNAME = os.Getenv("RABBITMQ_USERNAME")
+	RABBITMQ_PASSWORD = os.Getenv("RABBITMQ_PASSWORD")
+	RABBITMQ_VHOST = os.Getenv("RABBITMQ_VHOST")
+
 	return nil
 }
 
@@ -47,6 +57,10 @@ func validateAndLoad() error {
 	}
 
 	if err := convertToInt(&SQL_DB_PORT, "SQL_DB_PORT"); err != nil {
+		return err
+	}
+
+	if err := convertToInt(&RABBITMQ_PORT, "RABBITMQ_PORT"); err != nil {
 		return err
 	}
 
