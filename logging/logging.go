@@ -65,3 +65,9 @@ func Debug(message string, args ...interface{}) {
 	msg := fmt.Sprintf(message, args...)
 	logger.Debug(msg)
 }
+
+func Fatal(message string, args ...any) {
+	msg := fmt.Sprintf(message, args...)
+	logger.Error(msg)
+	panic(msg)
+}
