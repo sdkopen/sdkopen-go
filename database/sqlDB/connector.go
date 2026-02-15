@@ -5,10 +5,8 @@ import (
 	"fmt"
 	_ "time"
 
-	"github.com/lib/pq"
 	"github.com/sdkopen/sdkopen-go/common/env"
 	"github.com/sdkopen/sdkopen-go/logging"
-	sqltrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/database/sql"
 )
 
 const (
@@ -40,11 +38,10 @@ func NewDefaultConnector() *SqlConnector {
 }
 
 func (c *SqlConnector) Connect() *sql.DB {
-	sqltrace.Register(defaultDriver, &pq.Driver{})
 
 	var connectionString = c.getConnectionURI()
 
-	sqlDB, err := sqltrace.Open(env.SQL_DB_DRIVER, connectionString)
+	sqlDB, err := sql.Open(env.SQL_DB_DRIVER, connectionString)
 	if err != nil {
 		logging.Fatal(dbConnectionErrorMsg, defaultDriver, err)
 	}
