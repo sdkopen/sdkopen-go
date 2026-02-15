@@ -1,4 +1,4 @@
-package sqlDB
+package database
 
 import (
 	"context"
@@ -26,7 +26,7 @@ func NewStatement(ctx context.Context, query string, params ...any) *Statement {
 }
 
 func (s *Statement) Execute() error {
-	return s.ExecuteInInstance(sqlDBInstance)
+	return s.ExecuteInInstance(dbInstance)
 }
 
 func (s *Statement) ExecuteInInstance(instance *sql.DB) error {

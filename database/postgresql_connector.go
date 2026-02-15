@@ -1,9 +1,8 @@
-package sqlDB
+package database
 
 import (
 	"database/sql"
 	"fmt"
-	_ "time"
 
 	"github.com/sdkopen/sdkopen-go/common/env"
 	"github.com/sdkopen/sdkopen-go/logging"
@@ -12,12 +11,9 @@ import (
 const (
 	defaultDriver        string = "postgres"
 	defaultConnectionURI string = "host=%s port=%d user=%s password=%s dbname=%s sslmode=%s"
-
-	dbConnectionSuccessMsg string = "%s database connected"
-	dbConnectionErrorMsg   string = "An error occurred while trying to connect to the %s database. Error: %+v"
 )
 
-type SqlConnector struct {
+type PostgresqlConnector struct {
 	host     string
 	port     int
 	database string
@@ -26,8 +22,8 @@ type SqlConnector struct {
 	sslMode  string
 }
 
-func NewDefaultConnector() *SqlConnector {
-	return &SqlConnector{
+func NewDefaultPostgresqlConnector() *PostgresqlConnector {
+	return &PostgresqlConnector{
 		host:     env.SQL_DB_URL,
 		port:     env.SQL_DB_PORT,
 		database: env.SQL_DB_NAME,
@@ -37,30 +33,31 @@ func NewDefaultConnector() *SqlConnector {
 	}
 }
 
-func (c *SqlConnector) Connect() *sql.DB {
-
+func (c *PostgresqlConnector) Connect() *sql.DB {
 	var connectionString = c.getConnectionURI()
 
-	sqlDB, err := sql.Open(env.SQL_DB_DRIVER, connectionString)
+	db, err := sql.Open(env.SQL_DB_DRIVER, connectionString)
 	if err != nil {
-		logging.Fatal(dbConnectionErrorMsg, defaultDriver, err)
+		logging.Fatal("an error occurred while trying to connect to the %s database: %+v", defaultDriver, err)
 	}
 
-	if err = sqlDB.Ping(); err != nil {
-		logging.Fatal(dbConnectionErrorMsg, defaultDriver, err)
+	if err = db.Ping(); err != nil {
+		logging.Fatal("an error occurred while trying to connect to the %s database: %+v", defaultDriver, err)
 	}
 
-	return sqlDB
+	return db
 }
 
-func (c *SqlConnector) getConnectionURI() string {
-	password := c.password
-
+func (c *PostgresqlConnector) getConnectionURI() string {
 	return fmt.Sprintf(defaultConnectionURI,
 		c.host,
 		c.port,
 		c.username,
-		password,
+		c.password,
 		c.database,
 		c.sslMode)
+}
+
+func Postgresql() *sql.DB {
+	return NewDefaultPostgresqlConnector().Connect()
 }
