@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/joho/godotenv"
+	"github.com/sdkopen/sdkopen-go/logging"
 )
 
 const (
@@ -28,12 +29,11 @@ var (
 	RABBITMQ_VHOST           = ""
 )
 
-// Load loads and validates all environment variables. It's used in app initialization.
-func Load() error {
+func Load() {
 	_ = godotenv.Load()
 
 	if err := validateAndLoad(); err != nil {
-		return err
+		logging.Fatal(err.Error())
 	}
 
 	SQL_DB_NAME = os.Getenv("SQL_DB_NAME")
@@ -47,8 +47,6 @@ func Load() error {
 	RABBITMQ_USERNAME = os.Getenv("RABBITMQ_USERNAME")
 	RABBITMQ_PASSWORD = os.Getenv("RABBITMQ_PASSWORD")
 	RABBITMQ_VHOST = os.Getenv("RABBITMQ_VHOST")
-
-	return nil
 }
 
 func validateAndLoad() error {
