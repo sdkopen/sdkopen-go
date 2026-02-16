@@ -16,7 +16,7 @@ const (
 	migrationDefaultPath string = "${PWD}/database/migrations"
 
 	migrationIgnoringMsg           string = "Ignoring migration because env variable SQL_DB_MIGRATION is set to false"
-	migrationStartingMsg           string = "Starting migration execution"
+	migrationStartingMsg           string = "Starting migration execution in path: %s"
 	migrationCouldNotConnectDBMsg  string = "Could not connect to database for migration: %v"
 	migrationExecutionWithErrorMsg string = "An error when executing database migration: %v"
 	migrationFinalizedMsg          string = "Migration finalized successfully"
@@ -33,14 +33,13 @@ func migration(db *sql.DB) error {
 		sourceUrl = migrationDefaultPath
 	}
 
-	logging.Info(migrationStartingMsg)
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		logging.Error(migrationCouldNotConnectDBMsg, err)
 		return err
 	}
 
-	logging.Info(migrationStartingMsg)
+	logging.Info(migrationStartingMsg, sourceUrl)
 	migrationDBInstance, _ := migrate.NewWithDatabaseInstance("file://"+sourceUrl, env.SQL_DB_NAME, driver)
 	if migrationDBInstance != nil {
 		if err = migrationDBInstance.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
