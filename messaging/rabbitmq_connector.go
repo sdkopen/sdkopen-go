@@ -53,3 +53,10 @@ func (c *RabbitMQConnector) getConnectionURI() string {
 		c.vhost,
 	)
 }
+
+func RabbitMQ() *Provider {
+	return &Provider{
+		CreatePublisher: CreateRabbitMQPublisher,
+		CreateConsumer:  CreateRabbitMQConsumer,
+	}
+}

@@ -2,15 +2,18 @@
 
 Modulo de mensageria do sdkopen-go. Fornece interfaces abstratas (`Publisher`, `Consumer`) e uma implementacao concreta para **RabbitMQ** usando a lib [amqp091-go](https://github.com/rabbitmq/amqp091-go).
 
+O modulo utiliza o provider pattern — um unico provider configura tanto o publisher quanto o consumer, garantindo que ambos usem o mesmo backend de mensageria.
+
 ## Arquitetura
 
 ```
 messaging/
-├── publisher.go              # Interface Publisher e funcoes package-level
-├── consumer.go               # Interface Consumer, Subscription e funcoes package-level
+├── messaging.go              # Initialize(provider), Provider struct
+├── publisher.go              # Interface Publisher e funcao Publish
+├── consumer.go               # Interface Consumer, Subscribe e StartConsumer
 ├── message.go                # Struct Message e PublishOption (functional options)
 ├── observer.go               # Graceful shutdown via observer pattern
-├── rabbitmq_connector.go     # Conexao AMQP (RabbitMQConnector)
+├── rabbitmq_connector.go     # Conexao AMQP (RabbitMQConnector) + factory RabbitMQ()
 ├── rabbitmq_publisher.go     # Implementacao Publisher para RabbitMQ
 └── rabbitmq_consumer.go      # Implementacao Consumer para RabbitMQ
 ```
@@ -29,9 +32,7 @@ RABBITMQ_VHOST=/
 
 As variaveis sao carregadas automaticamente pelo `env.Load()` na inicializacao da aplicacao.
 
-## Publisher
-
-### Inicializacao
+## Inicializacao
 
 ```go
 package main
@@ -41,10 +42,14 @@ import (
 )
 
 func main() {
-    // Inicializa o publisher com a factory do RabbitMQ
-    messaging.InitializePublisher(messaging.CreateRabbitMQPublisher)
+    // Inicializa publisher e consumer com o provider RabbitMQ
+    messaging.Initialize(messaging.RabbitMQ())
 }
 ```
+
+`Initialize` recebe um `*Provider` que contem as factories de publisher e consumer. O publisher e criado imediatamente; o consumer fica disponivel para ser iniciado via `StartConsumer()`.
+
+## Publisher
 
 ### Publicando mensagens
 
@@ -85,36 +90,14 @@ err := messaging.Publish(ctx, "order.created", orderBytes,
 
 ### Registrando handlers
 
-Registre os handlers **antes** de iniciar o consumer:
+Registre os handlers **antes** de chamar `StartConsumer()`:
 
 ```go
-package main
+messaging.Subscribe("order.created", handleOrderCreated)
+messaging.Subscribe("payment.confirmed", handlePayment)
 
-import (
-    "context"
-    "encoding/json"
-
-    "github.com/sdkopen/sdkopen-go/messaging"
-)
-
-func handleOrderCreated(ctx context.Context, msg messaging.Message) error {
-    var order Order
-    if err := json.Unmarshal(msg.Body, &order); err != nil {
-        return err
-    }
-
-    // Processa o pedido...
-    return nil
-}
-
-func main() {
-    // Registra os handlers
-    messaging.Subscribe("order.created", handleOrderCreated)
-    messaging.Subscribe("payment.confirmed", handlePayment)
-
-    // Inicia o consumer (bloqueia a goroutine atual)
-    messaging.StartConsumer(messaging.CreateRabbitMQConsumer)
-}
+// Inicia o consumer (bloqueia a goroutine atual)
+messaging.StartConsumer()
 ```
 
 ### Comportamento do Consumer
@@ -148,7 +131,7 @@ O modulo se integra automaticamente com o `observer` para shutdown graceful:
 2. Se o timeout for atingido, forca o encerramento
 3. Fecha o channel e a conexao AMQP
 
-Isso acontece automaticamente ao usar `InitializePublisher` e `StartConsumer` — nao e necessaria nenhuma configuracao adicional.
+Isso acontece automaticamente ao usar `Initialize` e `StartConsumer` — nao e necessaria nenhuma configuracao adicional.
 
 ## Exemplo completo
 
@@ -174,9 +157,10 @@ func main() {
         log.Fatal(err)
     }
 
-    // --- Publisher (ex: servico HTTP que publica eventos) ---
-    messaging.InitializePublisher(messaging.CreateRabbitMQPublisher)
+    // Inicializa o provider RabbitMQ (publisher + consumer)
+    messaging.Initialize(messaging.RabbitMQ())
 
+    // --- Publicando eventos ---
     order := Order{ID: "123", Total: 99.90}
     body, _ := json.Marshal(order)
 
@@ -185,7 +169,7 @@ func main() {
         log.Fatal(err)
     }
 
-    // --- Consumer (ex: worker que processa eventos) ---
+    // --- Consumindo eventos ---
     messaging.Subscribe("order.created", func(ctx context.Context, msg messaging.Message) error {
         var o Order
         if err := json.Unmarshal(msg.Body, &o); err != nil {
@@ -195,22 +179,20 @@ func main() {
         return nil
     })
 
-    messaging.StartConsumer(messaging.CreateRabbitMQConsumer)
+    messaging.StartConsumer()
 }
 ```
 
 ## Implementando um novo provider
 
-Para criar um novo provider (ex: Kafka, SQS), basta implementar as interfaces:
+Para criar um novo provider (ex: Kafka, SQS), implemente as interfaces `Publisher` e `Consumer`:
 
 ```go
-// Publisher
 type Publisher interface {
     Publish(ctx context.Context, topic string, body []byte, opts ...PublishOption) error
     Close() error
 }
 
-// Consumer
 type Consumer interface {
     Subscribe(subscription Subscription)
     Start() error
@@ -218,16 +200,19 @@ type Consumer interface {
 }
 ```
 
-E criar uma factory function para cada:
+E crie uma funcao que retorne o `*Provider` com as factories:
 
 ```go
-func CreateMyPublisher() Publisher { ... }
-func CreateMyConsumer() Consumer { ... }
+func Kafka() *messaging.Provider {
+    return &messaging.Provider{
+        CreatePublisher: func() messaging.Publisher { ... },
+        CreateConsumer:  func() messaging.Consumer { ... },
+    }
+}
 ```
 
 Uso:
 
 ```go
-messaging.InitializePublisher(CreateMyPublisher)
-messaging.StartConsumer(CreateMyConsumer)
+messaging.Initialize(Kafka())
 ```

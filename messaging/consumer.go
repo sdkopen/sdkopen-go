@@ -29,8 +29,8 @@ func Subscribe(topic string, handler HandlerFunc) {
 	subscriptions = append(subscriptions, Subscription{Topic: topic, Handler: handler})
 }
 
-func StartConsumer(factory func() Consumer) {
-	consumerInstance = factory()
+func StartConsumer() {
+	consumerInstance = consumerFactory()
 	for _, sub := range subscriptions {
 		consumerInstance.Subscribe(sub)
 	}
