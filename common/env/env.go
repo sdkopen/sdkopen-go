@@ -36,7 +36,7 @@ func Load() {
 	_ = godotenv.Load()
 
 	if err := validateAndLoad(); err != nil {
-		logging.Fatal(err.Error())
+		logging.Fatal("%s", err.Error())
 	}
 
 	SQL_DB_NAME = os.Getenv("SQL_DB_NAME")

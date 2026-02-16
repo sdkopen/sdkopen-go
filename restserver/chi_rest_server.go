@@ -85,7 +85,7 @@ func (s *ChiWebServer) registerCustomMiddleware(m IMiddleware) {
 			if err := m.Apply(webCtx); err != nil {
 				w.WriteHeader(400)
 				if err := json.NewEncoder(w).Encode(err); err != nil {
-					logging.Error(err.Error())
+					logging.Error("%s", err.Error())
 				}
 				return
 			}
