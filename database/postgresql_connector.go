@@ -6,6 +6,8 @@ import (
 
 	"github.com/sdkopen/sdkopen-go/common/env"
 	"github.com/sdkopen/sdkopen-go/logging"
+
+	_ "github.com/lib/pq"
 )
 
 const (
