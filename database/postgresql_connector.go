@@ -13,6 +13,7 @@ import (
 const (
 	defaultDriver        string = "postgres"
 	defaultConnectionURI string = "host=%s port=%d user=%s password=%s dbname=%s sslmode=%s"
+	dbMigrationErrorMsg  string = "An error occurred when validate database migrations: %+v"
 )
 
 type PostgresqlConnector struct {
@@ -45,6 +46,10 @@ func (c *PostgresqlConnector) Connect() *sql.DB {
 
 	if err = db.Ping(); err != nil {
 		logging.Fatal("an error occurred while trying to connect to the %s database: %+v", defaultDriver, err)
+	}
+
+	if err := migration(db); err != nil {
+		logging.Fatal(dbMigrationErrorMsg, err)
 	}
 
 	return db
