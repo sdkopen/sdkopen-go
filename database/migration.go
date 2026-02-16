@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	migrationDefaultPath string = "./database/migrations"
+	migrationDefaultPath string = "${PWD}/database/migrations"
 
 	migrationIgnoringMsg           string = "Ignoring migration because env variable SQL_DB_MIGRATION is set to false"
 	migrationStartingMsg           string = "Starting migration execution"
