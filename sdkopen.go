@@ -31,6 +31,7 @@ func Initialize(opts *SdkOpenOptions) {
 
 	if opts.Messaging != nil {
 		messaging.Initialize(opts.Messaging())
+		go messaging.StartConsumer()
 	}
 
 	if opts.RestServer != nil {
