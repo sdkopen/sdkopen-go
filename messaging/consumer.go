@@ -2,9 +2,6 @@ package messaging
 
 import (
 	"context"
-
-	"github.com/sdkopen/sdkopen-go/logging"
-	"github.com/sdkopen/sdkopen-go/observer"
 )
 
 type HandlerFunc func(ctx context.Context, msg Message) error
@@ -27,14 +24,4 @@ var (
 
 func Subscribe(topic string, handler HandlerFunc) {
 	subscriptions = append(subscriptions, Subscription{Topic: topic, Handler: handler})
-}
-
-func StartConsumer() {
-	consumerInstance = consumerFactory()
-	for _, sub := range subscriptions {
-		consumerInstance.Subscribe(sub)
-	}
-	observer.Attach(consumerObserver{})
-	logging.Info("messaging consumer started")
-	consumerInstance.Start()
 }
