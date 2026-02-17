@@ -3,8 +3,8 @@ package restserver
 import (
 	"log"
 
+	"github.com/sdkopen/sdkopen-go/common/observer"
 	"github.com/sdkopen/sdkopen-go/logging"
-	"github.com/sdkopen/sdkopen-go/observer"
 )
 
 var (

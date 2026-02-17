@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 
+	"github.com/sdkopen/sdkopen-go/common/observer"
 	"github.com/sdkopen/sdkopen-go/logging"
-	"github.com/sdkopen/sdkopen-go/observer"
 )
 
 type databaseObserver struct {

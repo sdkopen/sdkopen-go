@@ -11,8 +11,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/sdkopen/sdkopen-go/common/observer"
 	"github.com/sdkopen/sdkopen-go/logging"
-	"github.com/sdkopen/sdkopen-go/observer"
 )
 
 type ChiWebServer struct {

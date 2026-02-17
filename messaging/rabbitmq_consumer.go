@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sdkopen/sdkopen-go/common/observer"
 	"github.com/sdkopen/sdkopen-go/logging"
-	"github.com/sdkopen/sdkopen-go/observer"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
