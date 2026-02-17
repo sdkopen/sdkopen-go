@@ -10,12 +10,12 @@ type Provider struct {
 	CreateConsumer  func() Consumer
 }
 
-var consumerFactory func() Consumer
-
 func Initialize(provider *Provider) {
 	publisherInstance = provider.CreatePublisher()
 	observer.Attach(publisherObserver{})
 	logging.Info("messaging publisher initialized")
 
-	consumerFactory = provider.CreateConsumer
+	consumerInstance = provider.CreateConsumer()
+	observer.Attach(consumerObserver{})
+	logging.Info("messaging consumer initialized")
 }
