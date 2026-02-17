@@ -20,3 +20,7 @@ type Consumer interface {
 var (
 	consumerInstance Consumer
 )
+
+func Subscribe(topic string, handler HandlerFunc) {
+	consumerInstance.Subscribe(Subscription{topic, handler})
+}
