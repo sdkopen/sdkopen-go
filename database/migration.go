@@ -1,9 +1,9 @@
 package database
 
 import (
-	_ "context"
 	"database/sql"
 	"errors"
+	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -13,8 +13,6 @@ import (
 )
 
 const (
-	migrationDefaultPath string = "${PWD}/database/migrations"
-
 	migrationIgnoringMsg           string = "Ignoring migration because env variable SQL_DB_MIGRATION is set to false"
 	migrationStartingMsg           string = "Starting migration execution in path: %s"
 	migrationCouldNotConnectDBMsg  string = "Could not connect to database for migration: %v"
@@ -30,7 +28,8 @@ func migration(db *sql.DB) error {
 
 	sourceUrl := env.SQL_DB_MIGRATION_SOURCE_URL
 	if sourceUrl == "" {
-		sourceUrl = migrationDefaultPath
+		pwd, _ := os.Getwd()
+		sourceUrl = pwd + "/database/migrations"
 	}
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
@@ -40,12 +39,15 @@ func migration(db *sql.DB) error {
 	}
 
 	logging.Info(migrationStartingMsg, sourceUrl)
-	migrationDBInstance, _ := migrate.NewWithDatabaseInstance("file://"+sourceUrl, env.SQL_DB_NAME, driver)
-	if migrationDBInstance != nil {
-		if err = migrationDBInstance.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-			logging.Error(migrationExecutionWithErrorMsg, err)
-			return err
-		}
+	migrationDBInstance, err := migrate.NewWithDatabaseInstance("file://"+sourceUrl, env.SQL_DB_NAME, driver)
+	if err != nil {
+		logging.Error(migrationExecutionWithErrorMsg, err)
+		return err
+	}
+
+	if err = migrationDBInstance.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		logging.Error(migrationExecutionWithErrorMsg, err)
+		return err
 	}
 
 	logging.Info(migrationFinalizedMsg)
