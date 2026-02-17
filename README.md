@@ -19,14 +19,14 @@ import (
     sdkopen "github.com/sdkopen/sdkopen-go"
     "github.com/sdkopen/sdkopen-go/database"
     "github.com/sdkopen/sdkopen-go/messaging"
-    "github.com/sdkopen/sdkopen-go/restserver"
+    "github.com/sdkopen/sdkopen-go/webserver"
 )
 
 func main() {
     sdkopen.Initialize(&sdkopen.SdkOpenOptions{
-        Database:   database.Postgresql,
-        Messaging:  messaging.RabbitMQ(),
-        RestServer: restserver.CreateChiServer,
+        Database:  database.Postgresql,
+        Messaging: messaging.RabbitMQ(),
+        WebServer: webserver.Chi,
     })
 }
 ```
@@ -105,22 +105,39 @@ messaging.StartConsumer()
 
 Documentacao completa: [messaging/README.md](messaging/README.md)
 
-### REST Server
+### Web Server
 
 Servidor HTTP com suporte a controllers e middlewares.
 
 | Provider | Factory |
 |----------|---------|
-| Chi | `restserver.CreateChiServer` |
+| Chi | `webserver.Chi` |
 
 ```go
 // Registra controllers e middlewares antes de inicializar
-restserver.RegisterController(myController)
-restserver.RegisterMiddleware(myMiddleware)
+webserver.RegisterController(myController)
+webserver.RegisterMiddleware(myMiddleware)
 
 sdkopen.Initialize(&sdkopen.SdkOpenOptions{
-    RestServer: restserver.CreateChiServer,
+    WebServer: webserver.Chi,
 })
+```
+
+### Web Client
+
+Cliente HTTP com API fluent (builder pattern) para chamadas de saida.
+
+```go
+client := webclient.New("https://api.example.com").
+    WithHeader("Authorization", "Bearer token").
+    WithTimeout(10 * time.Second)
+
+var result MyStruct
+resp, err := client.Get("/users/1", &result)
+resp, err := client.Post("/users", body, &result)
+resp, err := client.Put("/users/1", body, &result)
+resp, err := client.Patch("/users/1", body, &result)
+resp, err := client.Delete("/users/1", &result)
 ```
 
 ## Exemplos
@@ -131,11 +148,11 @@ sdkopen.Initialize(&sdkopen.SdkOpenOptions{
 func main() {
     env.Load()
 
-    restserver.RegisterController(userController)
+    webserver.RegisterController(userController)
 
     sdkopen.Initialize(&sdkopen.SdkOpenOptions{
-        Database:   database.Postgresql,
-        RestServer: restserver.CreateChiServer,
+        Database:  database.Postgresql,
+        WebServer: webserver.Chi,
     })
 }
 ```

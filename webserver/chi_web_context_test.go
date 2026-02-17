@@ -1,4 +1,4 @@
-package restserver
+package webserver
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	commonhttp "github.com/sdkopen/sdkopen-go/common/http"
 	"github.com/sdkopen/sdkopen-go/validator"
 )
 
@@ -216,7 +217,7 @@ func TestChiWebContext_AddHeaders(t *testing.T) {
 
 func TestChiWebContext_JsonResponse(t *testing.T) {
 	ctx, rec := newTestContext("GET", "/", "")
-	ctx.JsonResponse(StatusOK, map[string]string{"status": "ok"})
+	ctx.JsonResponse(commonhttp.StatusOK, map[string]string{"status": "ok"})
 
 	if rec.Code != 200 {
 		t.Fatalf("expected status 200, got %d", rec.Code)
@@ -236,7 +237,7 @@ func TestChiWebContext_JsonResponse(t *testing.T) {
 
 func TestChiWebContext_EmptyResponse(t *testing.T) {
 	ctx, rec := newTestContext("DELETE", "/", "")
-	ctx.EmptyResponse(StatusNoContent)
+	ctx.EmptyResponse(commonhttp.StatusNoContent)
 
 	if rec.Code != 204 {
 		t.Fatalf("expected status 204, got %d", rec.Code)
@@ -248,7 +249,7 @@ func TestChiWebContext_EmptyResponse(t *testing.T) {
 
 func TestChiWebContext_ErrorResponse(t *testing.T) {
 	ctx, rec := newTestContext("GET", "/test", "")
-	ctx.ErrorResponse(StatusBadRequest, errors.New("bad input"))
+	ctx.ErrorResponse(commonhttp.StatusBadRequest, errors.New("bad input"))
 
 	if rec.Code != 400 {
 		t.Fatalf("expected status 400, got %d", rec.Code)

@@ -1,6 +1,8 @@
-package restserver
+package webserver
 
 import "net/http"
+
+import commonhttp "github.com/sdkopen/sdkopen-go/common/http"
 
 type IMiddleware interface {
 	Apply(ctx WebContext) error
@@ -11,7 +13,7 @@ func accessControlMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, PATCH, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
-		if r.Method == Options.String() {
+		if r.Method == commonhttp.Options.String() {
 			return
 		}
 

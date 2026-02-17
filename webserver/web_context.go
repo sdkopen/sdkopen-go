@@ -1,9 +1,11 @@
-package restserver
+package webserver
 
 import (
 	"context"
 	"mime/multipart"
 	"net/http"
+
+	commonhttp "github.com/sdkopen/sdkopen-go/common/http"
 )
 
 type WebContext interface {
@@ -25,9 +27,9 @@ type WebContext interface {
 	FormFile(key string) (multipart.File, *multipart.FileHeader, error)
 	AddHeader(key string, value string)
 	AddHeaders(headers map[string]string)
-	Redirect(url string, statusCode HttpStatusCode)
+	Redirect(url string, statusCode commonhttp.HttpStatusCode)
 	ServeFile(path string)
-	JsonResponse(statusCode HttpStatusCode, body any)
-	ErrorResponse(statusCode HttpStatusCode, err error)
-	EmptyResponse(statusCode HttpStatusCode)
+	JsonResponse(statusCode commonhttp.HttpStatusCode, body any)
+	ErrorResponse(statusCode commonhttp.HttpStatusCode, err error)
+	EmptyResponse(statusCode commonhttp.HttpStatusCode)
 }

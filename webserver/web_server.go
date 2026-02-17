@@ -1,4 +1,4 @@
-package restserver
+package webserver
 
 import (
 	"log"
@@ -37,7 +37,7 @@ func ListenAndServe(server func() Server) {
 	ServerInstance.InjectCustomMiddlewares()
 	ServerInstance.InjectRoutes()
 
-	observer.Attach(restObserver{})
-	logging.Info("Service '%s' running in %d port", "REST-SERVER", 8080)
+	observer.Attach(webServerObserver{})
+	logging.Info("Service '%s' running in %d port", "WEB-SERVER", 8080)
 	log.Fatal(ServerInstance.ListenAndServe())
 }

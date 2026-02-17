@@ -1,4 +1,4 @@
-package restserver
+package webserver
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	commonhttp "github.com/sdkopen/sdkopen-go/common/http"
 	"github.com/sdkopen/sdkopen-go/logging"
 	"github.com/sdkopen/sdkopen-go/validator"
 )
@@ -123,7 +124,7 @@ func (ctx *chiWebContext) AddHeaders(headers map[string]string) {
 	}
 }
 
-func (ctx *chiWebContext) Redirect(url string, statusCode HttpStatusCode) {
+func (ctx *chiWebContext) Redirect(url string, statusCode commonhttp.HttpStatusCode) {
 	http.Redirect(ctx.writer, ctx.request, url, statusCode.Int())
 }
 
@@ -131,11 +132,11 @@ func (ctx *chiWebContext) ServeFile(path string) {
 	http.ServeFile(ctx.writer, ctx.request, path)
 }
 
-func (ctx *chiWebContext) JsonResponse(statusCode HttpStatusCode, body any) {
-	ctx.writer.Header().Add("Content-Type", ContentTypeJSON.String())
+func (ctx *chiWebContext) JsonResponse(statusCode commonhttp.HttpStatusCode, body any) {
+	ctx.writer.Header().Add("Content-Type", commonhttp.ContentTypeJSON.String())
 	ctx.writer.WriteHeader(statusCode.Int())
 
-	bytesBody, err := JsonEncoder(body)
+	bytesBody, err := commonhttp.JsonEncoder(body)
 	if err != nil {
 		ctx.ErrorResponse(http.StatusInternalServerError, err)
 	}
@@ -143,11 +144,11 @@ func (ctx *chiWebContext) JsonResponse(statusCode HttpStatusCode, body any) {
 	ctx.writer.Write(bytesBody)
 }
 
-func (ctx *chiWebContext) ErrorResponse(statusCode HttpStatusCode, err error) {
+func (ctx *chiWebContext) ErrorResponse(statusCode commonhttp.HttpStatusCode, err error) {
 	logging.Error("[%s] %s (%d): %v", ctx.request.Method, ctx.request.RequestURI, statusCode, err)
 	ctx.JsonResponse(statusCode, err.Error())
 }
 
-func (ctx *chiWebContext) EmptyResponse(statusCode HttpStatusCode) {
+func (ctx *chiWebContext) EmptyResponse(statusCode commonhttp.HttpStatusCode) {
 	ctx.writer.WriteHeader(statusCode.Int())
 }

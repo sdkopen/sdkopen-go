@@ -1,4 +1,4 @@
-package restserver
+package commonhttp
 
 type HttpMethod int
 

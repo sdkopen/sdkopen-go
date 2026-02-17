@@ -1,7 +1,9 @@
-package restserver
+package webserver
 
 import (
 	"testing"
+
+	commonhttp "github.com/sdkopen/sdkopen-go/common/http"
 )
 
 func TestRegisterController(t *testing.T) {
@@ -10,8 +12,8 @@ func TestRegisterController(t *testing.T) {
 
 	controller := &mockController{
 		routes: []Route{
-			{Path: "/api/users", HttpMethod: Get},
-			{Path: "/api/users", HttpMethod: Post},
+			{Path: "/api/users", HttpMethod: commonhttp.Get},
+			{Path: "/api/users", HttpMethod: commonhttp.Post},
 		},
 	}
 
@@ -23,10 +25,10 @@ func TestRegisterController(t *testing.T) {
 	if ServerRoutes[0].Path != "/api/users" {
 		t.Fatalf("expected /api/users, got %s", ServerRoutes[0].Path)
 	}
-	if ServerRoutes[0].HttpMethod != Get {
+	if ServerRoutes[0].HttpMethod != commonhttp.Get {
 		t.Fatalf("expected GET, got %s", ServerRoutes[0].HttpMethod)
 	}
-	if ServerRoutes[1].HttpMethod != Post {
+	if ServerRoutes[1].HttpMethod != commonhttp.Post {
 		t.Fatalf("expected POST, got %s", ServerRoutes[1].HttpMethod)
 	}
 }
@@ -34,8 +36,8 @@ func TestRegisterController(t *testing.T) {
 func TestRegisterController_Multiple(t *testing.T) {
 	ServerRoutes = nil
 
-	c1 := &mockController{routes: []Route{{Path: "/a", HttpMethod: Get}}}
-	c2 := &mockController{routes: []Route{{Path: "/b", HttpMethod: Post}}}
+	c1 := &mockController{routes: []Route{{Path: "/a", HttpMethod: commonhttp.Get}}}
+	c2 := &mockController{routes: []Route{{Path: "/b", HttpMethod: commonhttp.Post}}}
 
 	RegisterController(c1)
 	RegisterController(c2)

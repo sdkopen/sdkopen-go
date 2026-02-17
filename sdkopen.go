@@ -4,17 +4,17 @@ import (
 	"database/sql"
 
 	"github.com/sdkopen/sdkopen-go/common/env"
+	"github.com/sdkopen/sdkopen-go/common/observer"
 	"github.com/sdkopen/sdkopen-go/database"
 	"github.com/sdkopen/sdkopen-go/messaging"
-	"github.com/sdkopen/sdkopen-go/observer"
-	"github.com/sdkopen/sdkopen-go/restserver"
 	"github.com/sdkopen/sdkopen-go/validator"
+	"github.com/sdkopen/sdkopen-go/webserver"
 )
 
 type SdkOpenOptions struct {
-	Database   func() *sql.DB
-	Messaging  func() *messaging.Provider
-	RestServer func() restserver.Server
+	Database  func() *sql.DB
+	Messaging func() *messaging.Provider
+	WebServer func() webserver.Server
 }
 
 func init() {
@@ -34,7 +34,7 @@ func Initialize(opts *SdkOpenOptions) {
 		go messaging.StartConsumer()
 	}
 
-	if opts.RestServer != nil {
-		restserver.ListenAndServe(opts.RestServer)
+	if opts.WebServer != nil {
+		webserver.ListenAndServe(opts.WebServer)
 	}
 }
