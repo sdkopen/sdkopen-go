@@ -2,6 +2,8 @@ package messaging
 
 import (
 	"context"
+
+	"github.com/sdkopen/sdkopen-go/logging"
 )
 
 type HandlerFunc func(ctx context.Context, msg Message) error
@@ -19,8 +21,17 @@ type Consumer interface {
 
 var (
 	consumerInstance Consumer
+	subscriptions    []Subscription
 )
 
 func Subscribe(topic string, handler HandlerFunc) {
-	consumerInstance.Subscribe(Subscription{topic, handler})
+	subscriptions = append(subscriptions, Subscription{topic, handler})
+}
+
+func StartConsumer() {
+	for _, sub := range subscriptions {
+		consumerInstance.Subscribe(sub)
+	}
+	logging.Info("messaging consumer started")
+	consumerInstance.Start()
 }

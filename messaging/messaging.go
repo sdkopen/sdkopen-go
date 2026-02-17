@@ -16,7 +16,6 @@ func Initialize(provider *Provider) {
 	logging.Info("messaging publisher initialized")
 
 	consumerInstance = provider.CreateConsumer()
-	consumerInstance.Start()
 	observer.Attach(consumerObserver{})
 	logging.Info("messaging consumer initialized")
 }
