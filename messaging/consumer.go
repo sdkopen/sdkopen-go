@@ -19,9 +19,4 @@ type Consumer interface {
 
 var (
 	consumerInstance Consumer
-	subscriptions    []Subscription
 )
-
-func Subscribe(topic string, handler HandlerFunc) {
-	subscriptions = append(subscriptions, Subscription{Topic: topic, Handler: handler})
-}
