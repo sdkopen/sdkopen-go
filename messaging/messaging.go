@@ -12,10 +12,14 @@ type Provider struct {
 
 func Initialize(provider *Provider) {
 	publisherInstance = provider.CreatePublisher()
-	observer.Attach(publisherObserver{})
 	logging.Info("messaging publisher initialized")
 
 	consumerInstance = provider.CreateConsumer()
-	observer.Attach(consumerObserver{})
 	logging.Info("messaging consumer initialized")
+
+	if err := observer.Attach(messagingObserver{}); err != nil {
+		logging.Fatal("could not attach messaging to observer: %v", err)
+		return
+	}
+	logging.Info("messaging connected")
 }

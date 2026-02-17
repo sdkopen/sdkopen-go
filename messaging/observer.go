@@ -5,36 +5,27 @@ import (
 	"github.com/sdkopen/sdkopen-go/observer"
 )
 
-type publisherObserver struct{}
+type messagingObserver struct{}
 
-func (o publisherObserver) Close() {
-	logging.Info("waiting to safely close the messaging publisher")
+func (o messagingObserver) Close() {
+	logging.Info("waiting to safely close the messaging connection")
 	if observer.WaitRunningTimeout() {
-		logging.Warn("WaitGroup timed out, forcing close messaging publisher")
+		logging.Warn("WaitGroup timed out, forcing close messaging connection")
 	}
-	logging.Info("closing messaging publisher")
-	if publisherInstance == nil {
-		return
-	}
-	if err := publisherInstance.Close(); err != nil {
-		logging.Error("error when closing messaging publisher: %v", err)
-	}
-	publisherInstance = nil
-}
 
-type consumerObserver struct{}
-
-func (o consumerObserver) Close() {
-	logging.Info("waiting to safely close the messaging consumer")
-	if observer.WaitRunningTimeout() {
-		logging.Warn("WaitGroup timed out, forcing close messaging consumer")
-	}
 	logging.Info("closing messaging consumer")
-	if consumerInstance == nil {
-		return
+	if consumerInstance != nil {
+		if err := consumerInstance.Close(); err != nil {
+			logging.Error("error when closing messaging consumer: %v", err)
+		}
+		consumerInstance = nil
 	}
-	if err := consumerInstance.Close(); err != nil {
-		logging.Error("error when closing messaging consumer: %v", err)
+
+	logging.Info("closing messaging publisher")
+	if publisherInstance != nil {
+		if err := publisherInstance.Close(); err != nil {
+			logging.Error("error when closing messaging publisher: %v", err)
+		}
+		publisherInstance = nil
 	}
-	consumerInstance = nil
 }
